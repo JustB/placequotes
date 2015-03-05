@@ -1,0 +1,28 @@
+{% load staticfiles %}
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Placequotes!</title>
+    <link rel="stylesheet" href="{% static 'site.css' %}"/>
+</head>
+<body>
+<img src="{% static 'logo.png' %}" alt="Placequotes\"/>
+<h1>Welcome to Placequotes</h1>
+
+<p>You can use this service to request images for any webapp</p>
+<pre>
+    &lt;img src="{{ example }}"&gt;
+</pre>
+
+<h2>Examples</h2>
+<ul>
+    <li><img src="{% url 'placeholder' width=50 height=50 %}"></li>
+    <li><img src="{% url 'placeholder' width=100 height=50 %}"></li>
+    <li><img src="{% url 'placeholder' width=50 height=100 %}"></li>
+</ul>
+
+
+
+
+</body>
+</html>
