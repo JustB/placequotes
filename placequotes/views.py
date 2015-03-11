@@ -1,6 +1,7 @@
 import hashlib
 from io import BytesIO
 from PIL import Image, ImageDraw
+import textwrap
 
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.http import etag
@@ -15,11 +16,21 @@ def generate_etag(request, width, height):
     return hashlib.sha1(content.encode('utf-8')).hexdigest()
 
 
+def longestString(lista):
+    maximum = index = -1
+    for i,s in enumerate(lista):
+        if len(s) > maximum:
+            maximum = len(s)
+            index = i
+    return lista[index]
+
 class ImageForm(forms.Form):
     """Form to validate requested placeholder image."""
 
     height = forms.IntegerField(min_value=1, max_value=2000)
     width = forms.IntegerField(min_value=1, max_value=2000)
+
+
 
     def generate(self, image_format='PNG'):
         """Generate an image of the given type and return as raw bytes."""
@@ -27,15 +38,20 @@ class ImageForm(forms.Form):
         width = self.cleaned_data['width']
         key = '{}.{}.{}'.format(width, height, image_format)
         content = cache.get(key)
+        content = None
         if content is None:
             image = Image.new('RGB', (width, height))
             draw = ImageDraw.Draw(image)
             text = '{} X {}'.format(width, height)
+            text = '"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."'
+            pieces = textwrap.wrap(text, width // (draw.textsize('m')[0]))
             textwidth, textheight = draw.textsize(text)
-            if textwidth < width and textheight < height:
-                texttop = (height - textheight) // 2
-                textleft = (width - textwidth) // 2
-                draw.text((textleft, texttop), text, fill=(255, 255, 255))
+            textleft = (width - draw.textsize(longestString(pieces))[0]) // 2
+            texttop = (height - textheight * len(pieces)) // 2
+            for line in pieces:
+                draw.text((textleft, texttop), line, fill=(255, 255, 255))
+                texttop += textheight
+
             content = BytesIO()
             image.save(content, image_format)
             content.seek(0)
@@ -43,12 +59,11 @@ class ImageForm(forms.Form):
         return content
 
 
-@etag(generate_etag)
+#@etag(generate_etag)
 def placeholder(request, width, height):
     form = ImageForm({'height': height, 'width': width})
     if form.is_valid():
         image = form.generate()
-        # TODO: Generate image of requested size
         return HttpResponse(image, content_type='image/png')
     else:
         return HttpResponseBadRequest('Invalid Image Request')
