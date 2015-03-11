@@ -72,6 +72,6 @@ def placeholder(request, width, height):
 def index(request):
     example = reverse('placeholder', kwargs={'width': 50, 'height': 50})
     context = {
-        'example': request.build_absolute_uri(example)
+        'example': 'http://placequot.es/image/500x100'
     }
     return render(request, 'home.html', context)
