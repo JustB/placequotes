@@ -42,9 +42,10 @@ class ImageForm(forms.Form):
         if content is None:
             image = Image.new('RGB', (width, height))
             draw = ImageDraw.Draw(image)
-            text = '{} X {}'.format(width, height)
-            text = '"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."'
-            pieces = textwrap.wrap(text, width // (draw.textsize('m')[0]))
+            text1 = '{} X {}'.format(width, height)
+            text = '"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."' + text1
+            width_with_padding = width - 20
+            pieces = textwrap.wrap(text, width_with_padding // (draw.textsize('m')[0]))
             textwidth, textheight = draw.textsize(text)
             textleft = (width - draw.textsize(longestString(pieces))[0]) // 2
             texttop = (height - textheight * len(pieces)) // 2
