@@ -42,6 +42,7 @@ def generate_etag(request, width, height):
 
 
 def longestString(lista):
+    """ Gets the longest string in a list """
     maximum = index = -1
     for i,s in enumerate(lista):
         if len(s) > maximum:
@@ -52,8 +53,8 @@ def longestString(lista):
 class ImageForm(forms.Form):
     """Form to validate requested placeholder image."""
 
-    height = forms.IntegerField(min_value=1, max_value=2000)
-    width = forms.IntegerField(min_value=1, max_value=2000)
+    height = forms.IntegerField(min_value=150, max_value=2000)
+    width = forms.IntegerField(min_value=150, max_value=2000)
 
 
 
@@ -61,25 +62,41 @@ class ImageForm(forms.Form):
         """Generate an image of the given type and return as raw bytes."""
 
         #font = ImageFont.truetype("DroidSans.ttf", 12)
+        # Set font
         font = ImageFont.truetype("Lato-Reg.ttf", 14)
+        #font = ImageFont.truetype("monaco.ttf", 14)
+
+
+        # Get height and width
         height = self.cleaned_data['height']
         width = self.cleaned_data['width']
+        # Set key for cache TODO we should consider also the quote in this key
         key = '{}.{}.{}'.format(width, height, image_format)
         content = cache.get(key)
-        content = None
+        content = None # TODO remove this
         if content is None:
+            # Create new image
             image = Image.new('RGB', (width, height), '#DDD')
+            # Create a new draw
             draw = ImageDraw.Draw(image)
-            text1 = '{} X {}'.format(width, height)
+
+            dimension_text = '{} X {}'.format(width, height)
+
             text = get_quote()
+            # Leave 20px of padding, left and right
             width_with_padding = width - 40
-            pieces = textwrap.wrap(text, width_with_padding // (draw.textsize('m')[0]))
-            textwidth, textheight = draw.textsize(text)
+
+            pieces = textwrap.wrap(text, width_with_padding // (draw.textsize('i')[0]))
+
+            _, textheight = draw.textsize(text)
+            # Center the longest string into the box
             textleft = (width - draw.textsize(longestString(pieces))[0]) // 2
             texttop = (height - textheight * len(pieces)) // 2
             for line in pieces:
                 draw.text((textleft, texttop), line, fill=(0, 0, 0), font=font)
                 texttop += textheight+4
+            # Draw dimensions in top left corner
+            draw.text((0,0), dimension_text, fill=(0,0,0))
 
             content = BytesIO()
             image.save(content, image_format)
@@ -93,7 +110,9 @@ def placeholder(request, width, height):
     form = ImageForm({'height': height, 'width': width})
     if form.is_valid():
         image = form.generate()
-        return HttpResponse(image, content_type='image/png')
+        response = HttpResponse(image, content_type='image/png')
+        response['Content-Disposition'] = 'inline; filename=quote.png'
+        return response
     else:
         return HttpResponseBadRequest('Invalid Image Request')
 
