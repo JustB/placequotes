@@ -106,8 +106,7 @@ class FlickrApi
 
         if ($this->isValidResponse($results)) {
             $photos = $results->photos->photo;
-            $index = rand(0, count($photos)-1);
-            return $photos[$index];
+            return $photos[mt_rand(0, count($photos)-1)];
         }
 
         throw new \ErrorException('Failed fetching images');

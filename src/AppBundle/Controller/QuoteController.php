@@ -24,7 +24,24 @@ class QuoteController extends Controller
      */
     public function indexAction()
     {
-        return $this->render('quote/index.html.twig');
+        // @todo move default topics elsewhere
+        $topics = [
+            'life',
+            'love',
+            'happiness',
+            'peace',
+        ];
+
+        /**
+         * @var $wrapper FlickrApi
+         */
+        $wrapper = $this->get('app.flickr_api');
+
+        $photo  = $wrapper->getPhotoByTag($topics[mt_rand(0, count($topics) - 1)]);
+
+        return $this->render('quote/index.html.twig', [
+            'photo' => $photo,
+        ]);
     }
 
     /**
@@ -42,11 +59,11 @@ class QuoteController extends Controller
          */
         $wrapper = $this->get('app.flickr_api');
 
-        $recent  = $wrapper->getPhotoByTag($topic);
+        $photo  = $wrapper->getPhotoByTag($topic);
 
         return $this->render('quote/topic.html.twig', [
             'topic' => $topic,
-            'recent' => $recent,
+            'photo' => $photo,
         ]);
     }
 }
