@@ -34,10 +34,7 @@ class QuoteController extends Controller
      */
     public function topicAction($topic)
     {
-        $wrapper = new FlickrApi(
-            new Curl(),
-            'https://api.flickr.com/services/rest/', '76662479@N00', '5498865d0f4cdc6c0b9e89e13d98c04c'
-        );
+        $wrapper = $this->get('app.flickr_api');
 //        $recent  = $wrapper->getPhotoByTag($topic);
 
         return $this->render('quote/topic.html.twig', [
