@@ -3,21 +3,24 @@
 
 namespace AppBundle\Wrapper;
 
+use Doctrine\Common\Cache\CacheProvider;
 
 class Curl
 {
     protected $error_number = 0;
     protected $error_message = '';
 
+    public function __construct(CacheProvider $cache)
+    {
+        $this->cache = $cache;
+    }
+
     public function get($url, $cache_result = true)
     {
-//        $cache_file = 'cache'.DIRECTORY_SEPARATOR.md5($url);
-//
-//        if ($cache_result && file_exists($cache_file)) {
-//            $fh      = fopen($cache_file, 'r');
-//            $results = fread($fh, filesize($cache_file));
-//            fclose($fh);
-//        } else {
+        $results = $this->cache->fetch(md5($url));
+        if ($cache_result && ( $results !== false )) {
+
+        } else {
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -30,10 +33,8 @@ class Curl
 
             curl_close($ch);
 
-//            $fh = fopen($cache_file, 'w');
-//            fwrite($fh, $results);
-//            fclose($fh);
-//        }
+            $this->cache->save(md5($url), $results);
+        }
 
 
         return $results;
