@@ -105,7 +105,9 @@ class FlickrApi
         $results = json_decode($this->curl->get($url));
 
         if ($this->isValidResponse($results)) {
-            return $results->photos;
+            $photos = $results->photos->photo;
+            $index = rand(0, count($photos)-1);
+            return $photos[$index];
         }
 
         throw new \ErrorException('Failed fetching images');

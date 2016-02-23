@@ -37,6 +37,9 @@ class QuoteController extends Controller
      */
     public function topicAction($topic)
     {
+        /**
+         * @var $wrapper FlickrApi
+         */
         $wrapper = $this->get('app.flickr_api');
 
         $recent  = $wrapper->getPhotoByTag($topic);

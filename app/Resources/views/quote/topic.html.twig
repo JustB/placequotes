@@ -1,3 +1,9 @@
-This is a quote about {{ topic }}.
+{% extends 'base.html.twig' %}
 
-{{ dump(recent) }}
+
+
+{% block body %}
+    This is a quote about {{ topic }}.
+    <img src="{{ recent.url_m }}">
+    {{ dump(recent) }}
+{% endblock %}
