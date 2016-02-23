@@ -5,6 +5,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Wrapper\Curl;
+use AppBundle\Wrapper\FlickrApi;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +22,7 @@ class QuoteController extends Controller
      */
     public function indexAction()
     {
-        return new Response('<html><body>This is a random quote</body></html>');
+        return $this->render('quote/index.html.twig');
     }
 
     /**
@@ -32,6 +34,14 @@ class QuoteController extends Controller
      */
     public function topicAction($topic)
     {
-        return new Response(sprintf('<html><body>This is a quote about %s</body></html>', $topic));
+        $wrapper = new FlickrApi(
+            new Curl(),
+            'https://api.flickr.com/services/rest/', '76662479@N00', '5498865d0f4cdc6c0b9e89e13d98c04c'
+        );
+//        $recent  = $wrapper->getPhotoByTag($topic);
+
+        return $this->render('quote/topic.html.twig', [
+            'topic' => $topic,
+        ]);
     }
 }
