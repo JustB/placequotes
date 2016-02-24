@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+
+
+{% block body %}
+    This is a quote about {{ topic }}.
+    <p><img src="{{ photo.url_m }}"></p>
+    {{ dump(photo) }}
+{% endblock %}

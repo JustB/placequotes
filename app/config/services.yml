@@ -2,8 +2,18 @@
 # http://symfony.com/doc/current/book/service_container.html
 parameters:
 #    parameter_name: value
+  app.flickr_api.url: https://api.flickr.com/services/rest/
 
 services:
+  app.curl:
+    class: AppBundle\Wrapper\Curl
+    arguments: ['@app.cache']
+  app.flickr_api:
+    class: AppBundle\Wrapper\FlickrApi
+    arguments: ['@app.curl', '%app.flickr_api.url%', '%app.flickr_api.user_id%', '%app.flickr_api.api_key%']
+  app.cache:
+    class: Doctrine\Common\Cache\FilesystemCache
+    arguments: ['%kernel.cache_dir%/flickr_responses']
 #    service_name:
 #        class: AppBundle\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]

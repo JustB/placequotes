@@ -1,9 +1,0 @@
-# app/config/servers.yml
-prod:
-    host:          placequot.es
-    user:          deploy
-    identity_file: ~
-    forward_agent: ~
-    stage:         prod
-    deploy_path:   "/var/www/placequot.es"
-    branch:        master
